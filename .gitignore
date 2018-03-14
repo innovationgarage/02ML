@@ -2,3 +2,7 @@
 saved_models/
 dogImages/
 *.zip
+*.csv
+*.json
+*.npz
+config.py
