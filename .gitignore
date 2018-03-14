@@ -1,6 +1,7 @@
 .ipynb_checkpoints/
 saved_models/
 dogImages/
+images/
 *.zip
 *.csv
 *.json
