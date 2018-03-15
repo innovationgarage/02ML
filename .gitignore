@@ -1,7 +1,11 @@
 .ipynb_checkpoints/
+__pycache__/
 saved_models/
+dog_models/
 dogImages/
+shipImages/
 images/
+images_png/
 *.zip
 *.csv
 *.json
