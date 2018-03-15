@@ -4,9 +4,9 @@
 # In[1]:
 
 
-get_ipython().run_line_magic('reload_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+#get_ipython().run_line_magic('reload_ext', 'autoreload')
+#get_ipython().run_line_magic('autoreload', '2')
+#get_ipython().run_line_magic('matplotlib', 'inline')
 import platform
 python_v = platform.python_version()
 print (python_v)
@@ -55,33 +55,26 @@ def unzip(filename, path='./'):
         
 def load_dataset(path):
     data = load_files(path)
-    dog_files = np.array(data['filenames'])
-    dog_targets = np_utils.to_categorical(np.array(data['target']), 133)
-    return dog_files, dog_targets
+    class_files = np.array(data['filenames'])
+    class_targets = np_utils.to_categorical(np.array(data['target']), 133)
+    return class_files, class_targets
 
-#only the first time
-#url = 'https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip'
-#filename = download_dataset(url, path='./')
-#unzip(filename, path='./')
+train_files, train_targets = load_dataset('shipImages/train')
+valid_files, valid_targets = load_dataset('shipImages/valid')
+test_files, test_targets = load_dataset('shipImages/test')
 
-train_files, train_targets = load_dataset('dogImages/train')
-valid_files, valid_targets = load_dataset('dogImages/valid')
-test_files, test_targets = load_dataset('dogImages/test')
-
-dog_names = [item[20:-1] for item in sorted(glob("dogImages/train/*/"))]
+ship_names = [item[20:-1] for item in sorted(glob("shipImages/train/*/"))]
 
 # Let's check the dataset
-print('There are %d total dog categories.' % len(dog_names))
-print('There are %s total dog images.\n' % len(np.hstack([train_files, valid_files, test_files])))
-print('There are %d training dog images.' % len(train_files))
-print('There are %d validation dog images.' % len(valid_files))
-print('There are %d test dog images.'% len(test_files))
+print('There are %d total ship categories.' % len(ship_names))
+print('There are %s total ship images.\n' % len(np.hstack([train_files, valid_files, test_files])))
+print('There are %d training ship images.' % len(train_files))
+print('There are %d validation ship images.' % len(valid_files))
+print('There are %d test ship images.'% len(test_files))
 
 
 # In[4]:
 
-
-train_files
 
 
 # ## Pre-process data
@@ -201,7 +194,7 @@ model.load_weights('saved_models/bestmodel.hdf5')
 from sklearn.metrics import accuracy_score
 
 predictions = model.predict([test_resnet50])
-breed_predictions = [np.argmax(prediction) for prediction in predictions]
-breed_true_labels = [np.argmax(true_label) for true_label in test_targets]
-print('Test accuracy: %.4f%%' % (accuracy_score(breed_true_labels, breed_predictions) * 100))
+type_predictions = [np.argmax(prediction) for prediction in predictions]
+type_true_labels = [np.argmax(true_label) for true_label in test_targets]
+print('Test accuracy: %.4f%%' % (accuracy_score(type_true_labels, type_predictions) * 100))
 
