@@ -3,10 +3,12 @@ import os.path
 import cv2
 import pandas as pd
 import time
+import sys
 from requests_html import HTMLSession
 s = HTMLSession()
 
-all_ships = np.load("all_ships.zoom=4.npz")['all_ships']
+#all_ships = np.load("all_ships.zoom=3.npz")['all_ships']
+all_ships = np.load(sys.argv[1])['all_ships']
 
 # Filter out SAT-AIS ships
 """
