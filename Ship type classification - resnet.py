@@ -1,41 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
-#get_ipython().run_line_magic('reload_ext', 'autoreload')
-#get_ipython().run_line_magic('autoreload', '2')
-#get_ipython().run_line_magic('matplotlib', 'inline')
-import platform
-python_v = platform.python_version()
-print (python_v)
-
-
-# In[2]:
-
-
-import numpy as np
-import wget
-import zipfile
-import os
-from keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing import image
-from keras.layers import Dropout, Flatten, Dense
-from keras.applications import ResNet50
-from keras.models import Model, Sequential
-from keras.layers import Dense, GlobalAveragePooling2D
-from keras import backend as K
-from keras.applications.resnet50 import preprocess_input
-
-
-# 
-# ## Load data
-# 
-
-# In[3]:
-
-
 from sklearn.datasets import load_files       
 from keras.utils import np_utils
 import numpy as np
@@ -72,16 +34,7 @@ print('There are %d training ship images.' % len(train_files))
 print('There are %d validation ship images.' % len(valid_files))
 print('There are %d test ship images.'% len(test_files))
 
-
-# In[4]:
-
-
-
 # ## Pre-process data
-
-# In[5]:
-
-
 from keras.preprocessing import image                  
 from tqdm import tqdm
 
@@ -97,10 +50,6 @@ def paths_to_tensor(img_paths):
     list_of_tensors = [path_to_tensor(img_path) for img_path in tqdm(img_paths)]
     return np.vstack(list_of_tensors)
 
-
-# In[6]:
-
-
 from PIL import ImageFile                            
 ImageFile.LOAD_TRUNCATED_IMAGES = True                 
 
@@ -109,12 +58,7 @@ train_tensors = paths_to_tensor(train_files).astype('float32')/255
 valid_tensors = paths_to_tensor(valid_files).astype('float32')/255
 test_tensors = paths_to_tensor(test_files).astype('float32')/255
 
-
-# ## Fine-tune a pre-trained model (transfer learning)
-
-# In[7]:
-
-
+############################################
 from keras.applications.resnet50 import ResNet50
 from keras.applications.resnet50 import preprocess_input as preprocess_input_resnet50
 
@@ -123,23 +67,13 @@ def extract_Resnet50(file_paths):
     preprocessed_input = preprocess_input_resnet50(tensors)
     return ResNet50(weights='imagenet', include_top=False).predict(preprocessed_input, batch_size=32)
 
-
 # ## Extract feature
-
-# In[8]:
-
-
 train_resnet50 = extract_Resnet50(train_files)
 valid_resnet50 = extract_Resnet50(valid_files)
 test_resnet50 = extract_Resnet50(test_files)
 print("Resnet50 shape", train_resnet50.shape[1:])
 
-
 # ## Retrain the last layers for our data
-
-# In[10]:
-
-
 from keras.layers.pooling import GlobalAveragePooling2D
 from keras.layers.merge import Concatenate
 from keras.layers import Input, Dense
@@ -170,26 +104,17 @@ net = Dense(133, kernel_initializer='uniform', activation="softmax")(net)
 model = Model(inputs=[resnet50_input], outputs=[net])
 model.summary()
 
-
 # ## Compile and fit the network
-
-# In[12]:
-
-
 model.compile(loss='categorical_crossentropy', optimizer="rmsprop", metrics=['accuracy'])
-checkpointer = ModelCheckpoint(filepath='saved_models/bestmodel.hdf5', 
+checkpointer = ModelCheckpoint(filepath='ship_models/bestmodel.hdf5', 
                                verbose=1, save_best_only=True)
 model.fit([train_resnet50], train_targets, 
           validation_data=([valid_resnet50], valid_targets),
-          epochs=10, batch_size=4, callbacks=[checkpointer], verbose=1)
+          epochs=20, batch_size=4, callbacks=[checkpointer], verbose=1)
 
 
 # ## Test the model
-
-# In[13]:
-
-
-model.load_weights('saved_models/bestmodel.hdf5')
+model.load_weights('ship_models/bestmodel.hdf5')
 
 from sklearn.metrics import accuracy_score
 
